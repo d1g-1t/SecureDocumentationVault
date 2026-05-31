@@ -2,6 +2,7 @@ from __future__ import annotations
 
 
 class DomainError(Exception):
+    pass
 
 
 class DocumentNotFoundError(DomainError):
@@ -10,6 +11,7 @@ class DocumentNotFoundError(DomainError):
 
 
 class DocumentIntegrityError(DomainError):
+    pass
 
 
 class LegalHoldViolationError(DomainError):
@@ -35,6 +37,7 @@ class ShareLinkExhaustedError(DomainError):
 
 
 class SignatureVerificationError(DomainError):
+    pass
 
 
 class StorageObjectMissingError(DomainError):
