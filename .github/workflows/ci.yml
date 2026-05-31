@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Ruff lint
+        run: ruff check src/ tests/
+
+      - name: Mypy
+        run: mypy src/ --ignore-missing-imports || true  # advisory until 100% clean
+
+      - name: Unit tests
+        env:
+          PASETO_SECRET_KEY: "test_secret_key_at_least_32_chars___"
+          POSTGRES_PASSWORD: test
+          REDIS_PASSWORD: test
+          MINIO_ROOT_USER: test
+          MINIO_ROOT_PASSWORD: test
+        run: pytest tests/unit/ -v --tb=short
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install bandit
+      - run: bandit -r src/ -ll -q || true
